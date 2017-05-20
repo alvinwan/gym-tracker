@@ -91,7 +91,10 @@ def main():
     state['actions'] = env.action_space.n
 
     # Setup custom key configuration if available
-    state['binding'] = bindings.DefaultBinding(state)
+    if 'SpaceInvaders' in env_id:
+        state['binding'] = bindings.SpaceInvadersBinding(state)
+    else:
+        state['binding'] = bindings.DefaultBinding(state)
 
     env.render()
     env.unwrapped.viewer.window.on_key_press = lambda key, mod: \

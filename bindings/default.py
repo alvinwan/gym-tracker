@@ -6,7 +6,7 @@ from .interface import BindingInterface
 
 class DefaultBinding(BindingInterface):
 
-    def key_to_action_index(key: int):
+    def key_to_action_index(self, key: int):
         return int( key - ord('0') )
 
     def key_press(self, key: int, _):
@@ -17,7 +17,7 @@ class DefaultBinding(BindingInterface):
         action = self.key_to_action_index(key)
         if action <= 0 or action >= self.state['actions']:
             return
-        state['action'] = action
+        self.state['action'] = action
 
 
     def key_release(self, key: int, _):
