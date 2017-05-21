@@ -1,4 +1,4 @@
-# Gym Tracker
+# OpenAI Gym Tracker
 Tracks and logs actions for a human player. This repository also includes
 ~32,000 timesteps of human gameplay across 8 episodes, with an average of ~750
 points. (The random agent scores an average of ~200 points.)
