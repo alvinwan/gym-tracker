@@ -12,7 +12,9 @@ Usage:
 Options:
     --env_id=<id>       Environment ID [default: SpaceInvaders-v4]
     --skip-control=<n>  Use previous control n times. [default: 0]
-    --rollout-time=<t>   Amount of time to rollout with each action [default: 1000]
+    --rollout-time=<t>  Max. Amount of time to play the game for [default: 1e5]
+    --log-dir=<path>    Path to root of logs directory [default: ./logs]
+    --random            Use a random agent.
 """
 
 import docopt
@@ -20,6 +22,7 @@ import sys
 import gym
 import time
 import bindings
+import random
 
 from typing import Dict
 
@@ -53,15 +56,23 @@ def rollout(env, state: Dict):
     state['restart'] = False
     obser = env.reset()
     skip = 0
+    episode_reward = 0
     for t in range(state['rollout_time']):
         if not skip:
-            action, skip = state['action'], state['skip_control']
+            if state['random']:
+                action = random.randint(0, state['actions'] - 1)
+            else:
+                action = state['action']
+            skip = state['skip_control']
         else:
             skip -= 1
 
-        obser, r, done, info = env.step(action)
+        obser, reward, done, info = env.step(action)
+        episode_reward += reward
         env.render()
         if done:
+            print('Episode finished after %d timesteps with reward %d' % (
+                t, episode_reward))
             break
         if state['restart']:
             break
@@ -81,6 +92,7 @@ def main():
         'pause': False,
         'skip_control': int(arguments['--skip-control']),
         'rollout_time': int(arguments['--rollout-time']),
+        'random': arguments['--random']
     }
 
     env_id = arguments['--env_id']
@@ -97,12 +109,15 @@ def main():
         state['binding'] = bindings.DefaultBinding(state)
 
     env.render()
-    env.unwrapped.viewer.window.on_key_press = lambda key, mod: \
-        key_press(key, mod, state)
-    env.unwrapped.viewer.window.on_key_release = lambda key, mod: \
-        key_release(key, mod, state)
 
-    state['binding'].print_instructions()
+    if arguments['--random']:
+        print(' * Using random agent.')
+    else:
+        env.unwrapped.viewer.window.on_key_press = lambda key, mod: \
+            key_press(key, mod, state)
+        env.unwrapped.viewer.window.on_key_release = lambda key, mod: \
+            key_release(key, mod, state)
+        state['binding'].print_instructions()
 
     while 1:
         rollout(env, state)

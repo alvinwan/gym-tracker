@@ -33,6 +33,6 @@ class DefaultBinding(BindingInterface):
 
     def print_instructions(self):
         """Print instructions for user to use."""
-        print("ACTIONS={}".format(ACTIONS))
+        print("ACTIONS={}".format(self.state['actions']))
         print("Press keys 1 2 3 ... to take actions 1 2 3 ...")
         print("No keys pressed is taking action 0")
