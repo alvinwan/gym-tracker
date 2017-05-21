@@ -19,7 +19,6 @@ class DefaultBinding(BindingInterface):
             return
         self.state['action'] = action
 
-
     def key_release(self, key: int, _):
         """Set release actions accordingly on key release.
 

@@ -10,10 +10,10 @@ Usage:
     main.py [options]
 
 Options:
-    --env_id=<id>       Environment ID [default: SpaceInvaders-v4]
+    --env_id=<id>       Environment ID [default: SpaceInvadersNoFrameskip-v4]
     --skip-control=<n>  Use previous control n times. [default: 0]
-    --rollout-time=<t>  Max. Amount of time to play the game for [default: 1e5]
-    --log-dir=<path>    Path to root of logs directory [default: ./logs]
+    --rollout-time=<t>  Max. Amount of time to play the game for [default: 100000]
+    --logdir=<path>     Path to root of logs directory [default: ./logs]
     --random            Use a random agent.
 """
 
@@ -23,8 +23,12 @@ import gym
 import time
 import bindings
 import random
+import numpy as np
+import os
+import time
 
 from typing import Dict
+from typing import List
 
 
 def key_press(key: str, _, state: Dict):
@@ -57,6 +61,7 @@ def rollout(env, state: Dict):
     obser = env.reset()
     skip = 0
     episode_reward = 0
+    sar = []  # state-action-reward tuples
     for t in range(state['rollout_time']):
         if not skip:
             if state['random']:
@@ -67,36 +72,49 @@ def rollout(env, state: Dict):
         else:
             skip -= 1
 
-        obser, reward, done, info = env.step(action)
+        observation, reward, done, info = env.step(action)
+        sar.append(np.hstack((np.ravel(observation), action, reward)))
         episode_reward += reward
-        env.render()
         if done:
             print('Episode finished after %d timesteps with reward %d' % (
                 t, episode_reward))
+            write_sar_log(sar, state['logdir'], episode_reward)
+            sar = []
             break
         if state['restart']:
             break
+        env.render()
         while state['pause']:
             env.render()
             time.sleep(0.1)
+
+
+def write_sar_log(sars: List, logdir: str, episode_reward: int):
+    """Write state-action-rewards to a log file."""
+    np.savez_compressed(os.path.join(logdir,
+        '%s_%s' % (str(time.time())[-5:], episode_reward)), np.vstack(sars))
 
 
 def main():
     """Main runnable"""
 
     arguments = docopt.docopt(__doc__)
+    env_id = arguments['--env_id']
+    logdir = arguments['--logdir']
+    env = gym.make(env_id)
+    random.seed(0)
 
+    os.makedirs(logdir, exist_ok=True)
     state = {
         'action': 0,
         'restart': False,
         'pause': False,
         'skip_control': int(arguments['--skip-control']),
         'rollout_time': int(arguments['--rollout-time']),
-        'random': arguments['--random']
+        'random': arguments['--random'],
+        'env': env,
+        'logdir': logdir
     }
-
-    env_id = arguments['--env_id']
-    env = gym.make(env_id)
 
     if not hasattr(env.action_space, 'n'):
         raise Exception('Keyboard agent only supports discrete action spaces')
@@ -121,6 +139,7 @@ def main():
 
     while 1:
         rollout(env, state)
+
 
 if __name__ == '__main__':
     main()
