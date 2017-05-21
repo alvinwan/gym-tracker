@@ -1,7 +1,7 @@
 # Gym Tracker
-Tracks and logs actions for a human player. This repository also ncludes  
+Tracks and logs actions for a human player. This repository also includes
 ~32,000 timesteps of human gameplay across 8 episodes, with an average of ~750
-points, where the random agent scores an average of ~200 points.
+points. (The random agent scores an average of ~200 points.)
 
 > Disclaimer: I was the human player, and my gameplay isn't the best. If you're
 a SpaceInvader master or have logged data for other games, I would be more than
