@@ -1,5 +1,16 @@
 # Gym Tracker
-Tracks and logs actions for a human player
+Tracks and logs actions for a human player. This repository also ncludes  
+~32,000 timesteps of human gameplay across 8 episodes, with an average of ~750
+points, where the random agent scores an average of ~200 points.
+
+> Disclaimer: I was the human player, and my gameplay isn't the best. If you're
+a SpaceInvader master or have logged data for other games, I would be more than
+happy to include your logs.
+
+# Logs
+
+The logs are written to `.npz` - Numpy's compressed data file extension - and
+can be read using numpy utilities.
 
 # Install
 
@@ -39,8 +50,9 @@ Usage:
     main.py [options]
 
 Options:
-    --env_id=<id>       Environment ID [default: SpaceInvaders-v4]
+    --env_id=<id>       Environment ID [default: SpaceInvadersNoFrameskip-v4]
     --skip-control=<n>  Use previous control n times. [default: 0]
-    --rollout-time=<t>   Amount of time to play the game for [default: 1000]
-    --log-dir=<path>    Path to root of logs directory [default: ./logs]
+    --rollout-time=<t>  Max. Amount of time to play the game for [default: 100000]
+    --logdir=<path>     Path to root of logs directory [default: ./logs]
+    --random            Use a random agent.
 ```
