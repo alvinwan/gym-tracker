@@ -12,9 +12,10 @@ Usage:
 Options:
     --env_id=<id>       Environment ID [default: SpaceInvadersNoFrameskip-v4]
     --skip-control=<n>  Use previous control n times. [default: 0]
-    --rollout-time=<t>  Max. Amount of time to play the game for [default: 100000]
+    --rollout-time=<t>  Max. Amount of time to play the game for [default: 1000000]
     --logdir=<path>     Path to root of logs directory [default: ./logs]
     --random            Use a random agent.
+    --n_episodes=<n>    Number of episodes to play [default: 1]
 """
 
 import docopt
@@ -101,6 +102,7 @@ def main():
     arguments = docopt.docopt(__doc__)
     env_id = arguments['--env_id']
     logdir = arguments['--logdir']
+    n_episodes = int(arguments['--n_episodes'])
     env = gym.make(env_id)
     random.seed(0)
 
@@ -137,7 +139,7 @@ def main():
             key_release(key, mod, state)
         state['binding'].print_instructions()
 
-    while 1:
+    for _ in range(n_episodes):
         rollout(env, state)
 
 
